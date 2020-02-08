@@ -64,20 +64,30 @@ class User extends Authenticatable
             ->orderBy('created_at', 'desc');
     }
 
-    public function followers($user_ids)
+    public function followers()
     {
-        if (!is_array($user_ids)) {
-            $user_ids = compact('user_ids');
-        }
-        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
+        return $this->belongsToMany(User::Class, 'followers', 'user_id', 'follower_id');
     }
 
-    public function followings($user_ids)
+    public function followings()
     {
-        if (!is_array($user_ids)) {
+        return $this->belongsToMany(User::Class, 'followers', 'follower_id', 'user_id');
+    }
+
+    public function follow($user_ids)
+    {
+        if ( ! is_array($user_ids)) {
             $user_ids = compact('user_ids');
         }
-        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'user_id');
+        $this->followings()->sync($user_ids, false);
+    }
+
+    public function unfollow($user_ids)
+    {
+        if ( ! is_array($user_ids)) {
+            $user_ids = compact('user_ids');
+        }
+        $this->followings()->detach($user_ids);
     }
 
     public function isFollowing($user_id)
